@@ -21,5 +21,5 @@ Documents
 ```
 scrapy crawl CCNP
 ```
-在settings.py中对mongdb的相关熟悉进行配置
+在settings.py中对mongdb的相关配置进行设置
 数据会直接导入mongdb中
