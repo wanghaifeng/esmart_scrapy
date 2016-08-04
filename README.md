@@ -21,5 +21,5 @@ Documents
 ```
 scrapy crawl CCNP
 ```
-程序运行结束以后，抓取的商品数据自动存入Mongodb数据库的ccnp集合中。
-商品所对应的图片信息保存到当前工程目录下的image路径下。
+在settings.py中对mongdb的相关熟悉进行配置
+数据会直接导入mongdb中
