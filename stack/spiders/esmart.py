@@ -10,7 +10,10 @@ import json
 import requests
 from lxml import html
 import re
-from urllib.parse import urljoin
+try:
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urljoin
 
 
 class MySpider(Spider):
