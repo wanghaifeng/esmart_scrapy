@@ -19,9 +19,9 @@ except ImportError:
 class MySpider(Spider):
     name = 'esmart'
     root_folder = './data/'
-    userid = input('login name: ')
-    passwd = input('password: ')
-    ebook = input('ebook id: ')
+    userid = raw_input('login name: ')
+    passwd = raw_input('password: ')
+    ebook = raw_input('ebook id: ')
 
     downloaded = []
 
