@@ -34,23 +34,53 @@ class MySpider(Spider):
     login_page = 'http://www.esmartclass.net/member/login'
     book_root_path = 'http://www.esmartclass.net/ebook/' + ebook
 
-    start_urls = [book_root_path + '/index.jsp',
-                  book_root_path + '/page/contents.jsp']
+    if ebook.startswith("SMART_"):
+        start_urls = [book_root_path + '/Digitalmain.jsp']
+        start_urls.append(book_root_path + '/main.swf')
+        start_urls.append(book_root_path + '/contents/intro.swf')
+        start_urls.append(book_root_path + '/contents/copyright.swf')
 
-    start_urls.append(book_root_path + '/game/sound/ending.mp3')
-    start_urls.append(book_root_path + '/images/icon/card_sound.png')
-    start_urls.append(book_root_path + '/game/sound/ddang.mp3')
-    for n in range(1, 60):
-        start_urls.append(book_root_path + '/page/page%d.jsp' % n)
-        start_urls.append(book_root_path + '/zoom_page/page%d.jsp' % n)
-    for n in range(1, 30):
-        start_urls.append(book_root_path + '/card/page%d.jsp' % n)
-        start_urls.append(book_root_path + '/game/page%d.jsp' % n)
-        start_urls.append(book_root_path + '/movie/page%d.html' % n)
-        start_urls.append(book_root_path + '/movie/page%d.swf' % n)
-    for n in range(1, 110):
-        for m in range(1, 5):
-            start_urls.append(book_root_path + '/partZoom/page%d_%d.jsp' % (n, m))
+        for n in range(1, 45):
+            start_urls.append(book_root_path + '/contents/smart_%d.swf' % n)
+        for n in range(1, 11):
+            start_urls.append(book_root_path + '/contents/smart_story%d.swf' % n)
+        for n in range(1, 11):
+            start_urls.append(book_root_path + '/contents/smart_story%d.swf' % n)
+        for n in range(1, 11):
+            start_urls.append(book_root_path + '/contents/effects/es%02d.mp3' % n)
+            start_urls.append(book_root_path + '/contents/effects/ns%02d.mp3' % n)
+            start_urls.append(book_root_path + '/contents/effects/ct%02d.mp3' % n)
+        for n in range(1, 11):
+            for m in range(1, 3):
+                start_urls.append(book_root_path + '/contents/effects/ns%02d-%d.mp3' %(n, m))
+        for n in range(1, 16):
+            for m in range(1, 16):
+                start_urls.append(book_root_path + '/contents/card/card_%d_%d.jpg' % (n, m))
+        for n in range(1, 11):
+            for m in range(1, 6):
+                start_urls.append(book_root_path + '/contents/card/word_%d_%d.jpg' % (n, m))
+        for n in range(1, 4):
+            for m in range(1, 4):
+                start_urls.append(book_root_path + '/contents/NSP%d_%d.swf' % (n, m))
+
+    else:
+        start_urls = [book_root_path + '/index.jsp',
+                      book_root_path + '/page/contents.jsp']
+
+        start_urls.append(book_root_path + '/game/sound/ending.mp3')
+        start_urls.append(book_root_path + '/images/icon/card_sound.png')
+        start_urls.append(book_root_path + '/game/sound/ddang.mp3')
+        for n in range(1, 60):
+            start_urls.append(book_root_path + '/page/page%d.jsp' % n)
+            start_urls.append(book_root_path + '/zoom_page/page%d.jsp' % n)
+        for n in range(1, 30):
+            start_urls.append(book_root_path + '/card/page%d.jsp' % n)
+            start_urls.append(book_root_path + '/game/page%d.jsp' % n)
+            start_urls.append(book_root_path + '/movie/page%d.html' % n)
+            start_urls.append(book_root_path + '/movie/page%d.swf' % n)
+        for n in range(1, 110):
+            for m in range(1, 5):
+                start_urls.append(book_root_path + '/partZoom/page%d_%d.jsp' % (n, m))
 
 
     def start_requests(self):
@@ -99,7 +129,11 @@ class MySpider(Spider):
 
 
     def downloadSrc(self, response):
-        parsed_body = html.fromstring(response.text)
+        parsed_body = ""
+        try:
+            parsed_body = html.fromstring(response.text)
+        except AttributeError:
+            return
         # Grab links to all images
         img = parsed_body.xpath('//./@src')
         css = parsed_body.xpath('//link/@href')
