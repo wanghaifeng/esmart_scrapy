@@ -1,15 +1,19 @@
 import os
 
 import errno
+from pathlib import Path
+
 from scrapy.spiders.init import Spider
 from scrapy.http import Request
-from scrapy.selector import HtmlXPathSelector
-from selenium import webdriver
 from scrapy.exceptions import CloseSpider
 import json
 import requests
 from lxml import html
 import re
+import logging
+
+logging.basicConfig(filename='crawl.log', filemode="w", level=logging.INFO)
+
 try:
     from urllib.parse import urljoin
 except ImportError:
@@ -19,9 +23,9 @@ except ImportError:
 class MySpider(Spider):
     name = 'esmart'
     root_folder = './data/'
-    userid = raw_input('login name: ')
-    passwd = raw_input('password: ')
-    ebook = raw_input('ebook id: ')
+    userid = input('login name: ')
+    passwd = input('password: ')
+    ebook = input('ebook id: ')
 
     downloaded = []
 
@@ -29,72 +33,23 @@ class MySpider(Spider):
     allowed_domains = ['esmartclass.net']
     login_page = 'http://www.esmartclass.net/member/login'
     book_root_path = 'http://www.esmartclass.net/ebook/' + ebook
-    start_urls = [ book_root_path + '/index.jsp',
-                   book_root_path + '/page/contents.jsp',
-                   book_root_path + '/page/page1.jsp',
-                   book_root_path + '/page/page2.jsp',
-                   book_root_path + '/page/page3.jsp',
-                   book_root_path + '/page/page4.jsp',
-                   book_root_path + '/page/page5.jsp',
-                   book_root_path + '/page/page6.jsp',
-                   book_root_path + '/page/page7.jsp',
-                   book_root_path + '/page/page8.jsp',
-                   book_root_path + '/page/page9.jsp',
-                   book_root_path + '/page/page10.jsp',
-                   book_root_path + '/page/page11.jsp',
-                   book_root_path + '/page/page12.jsp',
-                   book_root_path + '/page/page13.jsp',
-                   book_root_path + '/page/page14.jsp',
-                   book_root_path + '/page/page15.jsp',
-                   book_root_path + '/page/page16.jsp',
-                   book_root_path + '/page/page17.jsp',
-                   book_root_path + '/page/page18.jsp',
-                   book_root_path + '/page/page19.jsp',
-                   book_root_path + '/page/page20.jsp',
-                   book_root_path + '/page/page21.jsp',
-                   book_root_path + '/page/page22.jsp',
-                   book_root_path + '/page/page23.jsp',
-                   book_root_path + '/page/page24.jsp',
-                   book_root_path + '/page/page25.jsp',
-                   book_root_path + '/page/page26.jsp',
-                   book_root_path + '/page/page27.jsp',
-                   book_root_path + '/page/page28.jsp',
-                   book_root_path + '/page/page29.jsp',
-                   book_root_path + '/page/page30.jsp',
-                   book_root_path + '/zoom_page/page1.jsp',
-                   book_root_path + '/zoom_page/page2.jsp',
-                   book_root_path + '/zoom_page/page3.jsp',
-                   book_root_path + '/zoom_page/page4.jsp',
-                   book_root_path + '/zoom_page/page5.jsp',
-                   book_root_path + '/zoom_page/page6.jsp',
-                   book_root_path + '/zoom_page/page7.jsp',
-                   book_root_path + '/zoom_page/page8.jsp',
-                   book_root_path + '/zoom_page/page9.jsp',
-                   book_root_path + '/zoom_page/page10.jsp',
-                   book_root_path + '/zoom_page/page11.jsp',
-                   book_root_path + '/zoom_page/page12.jsp',
-                   book_root_path + '/zoom_page/page13.jsp',
-                   book_root_path + '/zoom_page/page14.jsp',
-                   book_root_path + '/zoom_page/page15.jsp',
-                   book_root_path + '/zoom_page/page16.jsp',
-                   book_root_path + '/zoom_page/page17.jsp',
-                   book_root_path + '/zoom_page/page18.jsp',
-                   book_root_path + '/zoom_page/page19.jsp',
-                   book_root_path + '/zoom_page/page20.jsp',
-                   book_root_path + '/zoom_page/page21.jsp',
-                   book_root_path + '/zoom_page/page22.jsp',
-                   book_root_path + '/zoom_page/page23.jsp',
-                   book_root_path + '/zoom_page/page24.jsp',
-                   book_root_path + '/zoom_page/page25.jsp',
-                   book_root_path + '/zoom_page/page26.jsp',
-                   book_root_path + '/zoom_page/page27.jsp',
-                   book_root_path + '/zoom_page/page28.jsp',
-                   book_root_path + '/zoom_page/page29.jsp',
-                   book_root_path + '/zoom_page/page30.jsp',
-                  ]
 
-    def __init__(self):
-        self.driver = webdriver.PhantomJS
+    start_urls = [book_root_path + '/index.jsp',
+                  book_root_path + '/page/contents.jsp']
+
+    start_urls.append(book_root_path + '/game/sound/ending.mp3')
+    start_urls.append(book_root_path + '/images/icon/card_sound.png')
+    start_urls.append(book_root_path + '/game/sound/ddang.mp3')
+    for n in range(1, 60):
+        start_urls.append(book_root_path + '/page/page%d.jsp' % n)
+        start_urls.append(book_root_path + '/zoom_page/page%d.jsp' % n)
+    for n in range(1, 30):
+        start_urls.append(book_root_path + '/card/page%d.jsp' % n)
+        start_urls.append(book_root_path + '/game/page%d.jsp' % n)
+    for n in range(1, 110):
+        for m in range(1, 5):
+            start_urls.append(book_root_path + '/partZoom/page%d_%d.jsp' % (n, m))
+
 
     def start_requests(self):
         yield Request(
@@ -103,12 +58,14 @@ class MySpider(Spider):
             dont_filter=True
         )
 
+
     def login(self, response):
         """Generate a login request."""
         return Request(url=self.login_page, method='POST',
                        body=json.dumps({'userid': self.userid, 'passwd': self.passwd}),
                        headers={'Content-Type': 'application/json'},
                        callback=self.check_login_response)
+
 
     def check_login_response(self, response):
         """Check the response returned by a login request to see if we are
@@ -125,29 +82,45 @@ class MySpider(Spider):
             # yield self.make_requests_from_url(url)
             yield Request(url, dont_filter=True)  # callback=self.parse
 
+
     def parse(self, response):
+        logging.info("URL:" + response.url)
         uri = response.url[27:]
         path = self.root_folder + uri.replace(uri.split("/")[-1], "")
         self.makePath(path)
 
-        filename = self.root_folder + uri.split(".")[0] + '.html'
+        filename = self.root_folder + uri
+        filename = filename.replace(".jsp", ".html")
         with open(filename, 'wb') as f:
             f.write(response.body.replace(b".jsp", b".html"))
         self.downloadSrc(response)
 
-    def downloadSrc(self, response):
 
+    def downloadSrc(self, response):
         parsed_body = html.fromstring(response.text)
         # Grab links to all images
         img = parsed_body.xpath('//./@src')
         css = parsed_body.xpath('//link/@href')
         mp3 = re.findall(r"aud_play_pause[\d]?\('(.*)mp3'", response.text)
+        card = []
+        try:
+            card = re.findall(r"Array\((\".*\")\);", response.text)[0].replace("\"", "").split(",")
+        except IndexError:
+            pass
 
         # Convert any relative urls to absolute urls
-        images = [self.book_root_path + '/images/icon/play.png', self.book_root_path + '/images/icon/pause.png', self.book_root_path + '/images/icon/pause_s.png' ]
+        images = [self.book_root_path + '/images/icon/play.png', self.book_root_path + '/images/icon/pause.png',
+                  self.book_root_path + '/images/icon/pause_s.png']
         images = images + [urljoin(response.url, url) for url in img]
         images = images + [urljoin(response.url, url) for url in css]
         images = images + [urljoin(response.url, url + 'mp3') for url in mp3]
+        images = images + [urljoin(response.url, '../images/flashcard/' + url + '.jpg') for url in card]
+        images = images + [urljoin(response.url, '../images/flashcard/' + url + '_word.jpg') for url in card]
+        images = images + [urljoin(response.url, '../audio/flashcard/F_' + url + '.mp3') for url in card]
+        images = images + [urljoin(response.url, '../images/game/' + url + '.png') for url in card]
+        images = images + [urljoin(response.url, '../images/game/' + url + '_word.png') for url in card]
+
+        logging.info(images)
 
         # Only download first x 10
         for contentUrl in images[0:1000]:  ## 100 will scrape 100 pictures
@@ -164,15 +137,18 @@ class MySpider(Spider):
                 for imgUrl in cssimg[0:1000]:  ## 100 will scrape 100 pictures
                     self.downloadContent(imgUrl)
 
+
     def downloadContent(self, url):
         uri = url[27:]
         path = self.root_folder + uri.replace(uri.split("/")[-1], "")
         self.makePath(path)
         img = requests.get(url)
-        f = open(self.root_folder + uri, 'wb')  ## add the folder name
+        file = self.root_folder + uri
+        f = open(file, 'wb')  ## add the folder name
         f.write(img.content)
         f.close()
         return img
+
 
     def makePath(self, path):
         try:
