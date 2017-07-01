@@ -47,6 +47,7 @@ class MySpider(Spider):
         start_urls.append(book_root_path + '/card/page%d.jsp' % n)
         start_urls.append(book_root_path + '/game/page%d.jsp' % n)
         start_urls.append(book_root_path + '/movie/page%d.html' % n)
+        start_urls.append(book_root_path + '/movie/page%d.swf' % n)
     for n in range(1, 110):
         for m in range(1, 5):
             start_urls.append(book_root_path + '/partZoom/page%d_%d.jsp' % (n, m))
