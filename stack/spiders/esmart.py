@@ -40,7 +40,7 @@ class MySpider(Spider):
         start_urls.append(book_root_path + '/contents/intro.swf')
         start_urls.append(book_root_path + '/contents/copyright.swf')
 
-        for n in range(1, 45):
+        for n in range(1, 66):
             start_urls.append(book_root_path + '/contents/smart_%d.swf' % n)
         for n in range(1, 11):
             start_urls.append(book_root_path + '/contents/smart_story%d.swf' % n)
