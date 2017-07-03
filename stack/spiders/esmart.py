@@ -42,27 +42,27 @@ class MySpider(Spider):
 
         for n in range(1, 66):
             start_urls.append(book_root_path + '/contents/smart_%d.swf' % n)
-        for n in range(1, 11):
+        for n in range(1, 21):
             start_urls.append(book_root_path + '/contents/smart_story%d.swf' % n)
-        for n in range(1, 11):
+        for n in range(1, 21):
             start_urls.append(book_root_path + '/contents/smart_chant%d.swf' % n)
-        for n in range(1, 11):
+        for n in range(1, 21):
             start_urls.append(book_root_path + '/contents/smart_cartoon%d.swf' % n)
-        for n in range(1, 11):
+        for n in range(1, 21):
             start_urls.append(book_root_path + '/contents/effects/es%02d.mp3' % n)
             start_urls.append(book_root_path + '/contents/effects/ns%02d.mp3' % n)
             start_urls.append(book_root_path + '/contents/effects/ct%02d.mp3' % n)
-        for n in range(1, 11):
-            for m in range(1, 3):
+        for n in range(1, 21):
+            for m in range(1, 11):
                 start_urls.append(book_root_path + '/contents/effects/ns%02d-%d.mp3' %(n, m))
-        for n in range(1, 16):
-            for m in range(1, 16):
+        for n in range(1, 31):
+            for m in range(1, 21):
                 start_urls.append(book_root_path + '/contents/card/card_%d_%d.jpg' % (n, m))
-        for n in range(1, 11):
-            for m in range(1, 6):
+        for n in range(1, 31):
+            for m in range(1, 16):
                 start_urls.append(book_root_path + '/contents/card/word_%d_%d.jpg' % (n, m))
-        for n in range(1, 4):
-            for m in range(1, 4):
+        for n in range(1, 31):
+            for m in range(1, 16):
                 start_urls.append(book_root_path + '/contents/NSP%d_%d.swf' % (n, m))
 
     else:
