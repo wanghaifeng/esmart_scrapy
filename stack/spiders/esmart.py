@@ -72,16 +72,16 @@ class MySpider(Spider):
         start_urls.append(book_root_path + '/game/sound/ending.mp3')
         start_urls.append(book_root_path + '/images/icon/card_sound.png')
         start_urls.append(book_root_path + '/game/sound/ddang.mp3')
-        for n in range(1, 60):
+        for n in range(1, 70):
             start_urls.append(book_root_path + '/page/page%d.jsp' % n)
             start_urls.append(book_root_path + '/zoom_page/page%d.jsp' % n)
-        for n in range(1, 30):
+        for n in range(1, 50):
             start_urls.append(book_root_path + '/card/page%d.jsp' % n)
             start_urls.append(book_root_path + '/game/page%d.jsp' % n)
             start_urls.append(book_root_path + '/movie/page%d.html' % n)
             start_urls.append(book_root_path + '/movie/page%d.swf' % n)
-        for n in range(1, 110):
-            for m in range(1, 5):
+        for n in range(1, 120):
+            for m in range(1, 15):
                 start_urls.append(book_root_path + '/partZoom/page%d_%d.jsp' % (n, m))
 
 
