@@ -4,7 +4,7 @@ import errno
 from pathlib import Path
 
 from scrapy.spiders.init import Spider
-from scrapy.http import Request
+from scrapy.http import Request, FormRequest
 from scrapy.exceptions import CloseSpider
 import json
 import requests
@@ -67,19 +67,17 @@ class TestSpider(Spider):
             return
             # Something went wrong, we couldn't log in, so nothing happens.
 
-        for url in self.start_urls:
-            # yield self.make_requests_from_url(url)
-            yield Request(url, method='POST', formdata=self.formdata)  # callback=self.parse
+        return FormRequest(self.start_urls, method='POST', formdata=self.formdata, callback=self.parse)
+        self.log("+++++++++++ ok +++++++++++++++")
 
 
     def parse(self, response):
-        logging.info("URL:" + response.url)
-        uri = response.url[27:]
-        path = self.root_folder + uri.replace(uri.split("/")[-1], "")
+        logging.info("URL: " + response.url)
+        path = self.root_folder + self.ebook
         self.makePath(path)
 
-        filename = self.root_folder + uri
-        filename = filename.replace(".jsp", ".html")
+        filename = path + "/index.html"
+        # filename = filename.replace(".jsp", ".html")
         with open(filename, 'wb') as f:
             f.write(response.body.replace(b".jsp", b".html"))
         self.downloadSrc(response)
@@ -102,8 +100,7 @@ class TestSpider(Spider):
             pass
 
         # Convert any relative urls to absolute urls
-        images = [self.book_root_path + '/images/icon/play.png', self.book_root_path + '/images/icon/pause.png',
-                  self.book_root_path + '/images/icon/pause_s.png']
+        images = []
         images = images + [urljoin(response.url, url) for url in img]
         images = images + [urljoin(response.url, url) for url in css]
         images = images + [urljoin(response.url, url + 'mp3') for url in mp3]
